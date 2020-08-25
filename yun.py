@@ -1,11 +1,11 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 import re, argparse
-import sys
+import sys,os
 from matplotlib import pyplot
 import plistlib
 import  numpy as np
-import pandas as pd
+
 # 获取重复 的曲目
 def finUuplicates(fileName):
     #read in a play list读取列表
@@ -39,17 +39,17 @@ def finUuplicates(fileName):
         print("found % d duplicates.track name saved to dup.txt" % len(dups))
     else:
         print("no duplicate tracks found")
-    f = open("D:/dups.txt", "w")
+    f = open(os.path+"\\dups.txt", "w",encoding='utf-8')
     for val in dups:
         f.write("[%d] %s\n" % (val[0], val[1]))
     f.close()
 #查找多个列表中共同的乐谱音轨
-def findCommonTracks(fileNames):
-    trackNameSets = []
-    for filename in fileNames:
-        trackName = set()
-        plist = plistlib.readPlist(filename)#返回文件字典
-        tracks = plist['Tracks']
-        for trackId,track in tracks.items():
+# def findCommonTracks(fileNames):
+#     trackNameSets = []
+#     for filename in fileNames:
+#         trackName = set()
+#         plist = plistlib.readPlist(filename)#返回文件字典
+#         tracks = plist['Tracks']
+#         for trackId,track in tracks.items():
             
 
