@@ -7,10 +7,10 @@ import plistlib
 import  numpy as np
 
 # 获取重复 的曲目
-def finUuplicates(fileName):
+def finUplicates(fileName):
     #read in a play list读取列表
-    plist  = plistlib.readPlist(fileName) #返回文件的顶层字典
-    # plistlibist  = plistlib.load(fileName)
+    # plist  = plistlib.readPlist(fileName) #返回文件的顶层字典
+    plist = plistlib.load(fileName)
     #get the tracks from the tracks dictionary 从tracks字典中获得tracks
     tracks = plist['Tracks']
     #创建一个曲目名称字典
@@ -39,17 +39,37 @@ def finUuplicates(fileName):
         print("found % d duplicates.track name saved to dup.txt" % len(dups))
     else:
         print("no duplicate tracks found")
-    f = open(os.path+"\\dups.txt", "w",encoding='utf-8')
+    f = open("dups.txt", "w",encoding='utf-8')
     for val in dups:
         f.write("[%d] %s\n" % (val[0], val[1]))
     f.close()
 #查找多个列表中共同的乐谱音轨
-# def findCommonTracks(fileNames):
-#     trackNameSets = []
-#     for filename in fileNames:
-#         trackName = set()
-#         plist = plistlib.readPlist(filename)#返回文件字典
-#         tracks = plist['Tracks']
-#         for trackId,track in tracks.items():
-            
+def findCommonTracks(fileNames):
+    trackNameSets = []
+    for filename in fileNames:
+        trackNames = set()
+        plist = plistlib.load(filename)#返回文件字典
+        tracks = plist['Tracks']
+        for trackId,track in tracks.items():
+            try:
+                trackNames.add(track['Name'])
+            except:
+                pass
+    trackNameSets.append(trackNames)
+    commonTracks = set.intersection(*trackNameSets)
+    if len(commonTracks)>0:
+      f = open("common.txt","w")
+      for val in commonTracks:
+        s = "%s\n" % val
+        f.write(s.encode('utf-8'))
+      f.close()
+      print("%d common tracks found."
+              "track names written to common.txt" % len(commonTracks))
+    else:
+         print("no common tarcks")
 
+
+
+
+if __name__=='__main__':
+    pass
