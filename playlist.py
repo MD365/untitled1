@@ -13,7 +13,7 @@ def findCommonTracks(fileNames):
     trackNameSets = []
     for fileName in fileNames:
 
-        trackNames= set()
+        trackNames= set() #创建set集合
         plist = plistlib.readPlist(fileName)
         tracks = plist['Tracks']
 
@@ -23,7 +23,7 @@ def findCommonTracks(fileNames):
             except:
                 pass
         trackNameSets.append(trackNames)
-    commonTracks = set.intersection(*trackNameSets)
+    commonTracks = set.intersection(*trackNameSets) #返回交集
 
     if len(commonTracks)>0:
         f = open("common.txt",'wb')
@@ -36,4 +36,4 @@ def findCommonTracks(fileNames):
 
     else:
         print("no common tracks")
-        
+

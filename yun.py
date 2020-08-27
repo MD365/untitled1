@@ -89,6 +89,5 @@ def plotStats(fileName):
 # x = np.array(durations, np.int32)
 
 if __name__=='__main__':
-    x = set('runoob')
-    y = set('google')
-print(x,y)
+    trackNames = set()
+    print (type(trackNames))
