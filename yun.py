@@ -68,8 +68,27 @@ def findCommonTracks(fileNames):
     else:
          print("no common tarcks")
 
+#收集统计信息
+def plotStats(fileName):
+    plist = plistlib.readPlist(fileName)
+    tracks = plist['Tracks']
+    ratings = []  #评分
+    durations = []#时长
 
+    for trackId,track in tracks.items():
+        try:
+            ratings.append(track["Album Rating"])
+            durations.append(track['Total Time'])
+        except:
+            pass
+    if ratings == [] or durations ==[]:
+        print("no valid album rating/total time data in %s"  % fileName)
+        return
 
+# 绘制数据
+# x = np.array(durations, np.int32)
 
 if __name__=='__main__':
-    pass
+    x = set('runoob')
+    y = set('google')
+print(x,y)
