@@ -23,3 +23,17 @@ def findCommonTracks(fileNames):
             except:
                 pass
         trackNameSets.append(trackNames)
+    commonTracks = set.intersection(*trackNameSets)
+
+    if len(commonTracks)>0:
+        f = open("common.txt",'wb')
+        for val in commonTracks:
+            s = "%s\n" %val
+            f.write(s.encode("utf-8"))
+        f.close()
+        print("%d comm tracks found ."
+              "track names written to common.txt" % len(commonTracks))
+
+    else:
+        print("no common tracks")
+        
