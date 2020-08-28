@@ -37,3 +37,25 @@ def findCommonTracks(fileNames):
     else:
         print("no common tracks")
 
+def plotStart(fileName):
+    """
+    Plot some statistics by readin track information from playlist.
+    通过读取播放列表中的轨迹信息来绘制一些统计数据。
+    """
+    plist = plistlib.readPlist(fileName)
+    tracks = plist['Tracks']
+    ratings = []
+    durations =[]
+    for trackId,track in tracks.items():
+        try:
+            ratings.append(track['Album Rating'])
+            durations.append(track['Total Time'])
+        except:
+            pass
+
+    if ratings == [] or durations == []:
+        print("no valid album rating/total time data in %s" % fileName)
+        return
+    # cross plot
+    x = np.array(durations , np.int32)#重新定义了list为int32
+
