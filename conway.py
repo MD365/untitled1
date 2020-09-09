@@ -10,8 +10,7 @@ vals = [ON,OFF]
 
 def randomGrid(N):
     """returns a grid of NxN random values返回一个由N*N组成的网格"""
-    return np.random.choice(vals,N*N,p=[0.2,0,8]).reshape(N,N)
-
+    return np.random.choice([255,0],N*N,p=[0.2,0,8]).reshape(N, N)
 def addGlider(i,j, grid):
     """adds a glider with top left cell at (i, j)添加左上角单元格为i，j的滑动器"""
     glider = np.array([
@@ -57,6 +56,69 @@ def update(frameNum, img,grid,N):
             # compute 8-neghbor sum 计算8-neghbor和
             # using toroidal boundary conditions - x and y wrap around使用环形边界条件- x和y绕圈
             # so that the simulaton takes place on a toroidal surface.使模拟发生在一个环形表面上
-            total = int(
+            total = int((grid[i, (j-1)%N] + grid[i, (j+1)%N] +
+                         grid[(i-1)%N, j] + grid[(i+1)%N, j] +
+                         grid[(i-1)%N, (j-1)%N] + grid[(i-1)%N, (j+1)%N] +
+                         grid[(i+1)%N, (j-1)%N] + grid[(i+1)%N, (j+1)%N])/255)
+            # apply Conway's rules
+            if grid[i, j]  == ON:
+                if (total < 2) or (total > 3):
+                    newGrid[i, j] = OFF
+            else:
+                if total == 3:
+                    newGrid[i, j] = ON
+    #update data
+    img.set_data(newGrid)
+    grid[:] = newGrid[:]
+    return img,
 
-            )
+def main():
+    # Command line args are in sys.argv[1], sys.argv[2] ..
+    # sys.argv[0] is the script name itself and can be ignored
+    # parse arguments 参数解析
+    parser = argparse.ArgumentParser(description="runs conway's game of life simulation.")
+    #add arguments
+    parser.add_argument('--grid-size',dest='N',required=False)
+    parser.add_argument('--mov-file',dest='movfile', required=False)
+    parser.add_argument('--interval',dest='interval',required=False)
+    parser.add_argument('--glider',action='store_true',required=False)
+    parser.add_argument('--gosper',action='store_true',required=False)
+    args = parser.parse_args()
+
+    #set grid size 设置网格大小
+    N = 100
+    if args.N and int(args.N)>8:
+        N = int(args.N)
+    #set animation update interval 设置动画更新间隔
+    updateInterval = 50
+    if args.interval:
+        updateInterval = int(args.interval)
+
+    #declare grid
+    grid = np.array([])
+    if args.glider:
+        grid = np.zeros(N*N).reshape(N,N)
+        addGlider(1,1,grid)
+    elif args.gosper:
+        grid = np.zeros(N*N).reshape(N,N)
+        addGosperGliderGun(10,10,grid)
+    else:
+        #populate grid with random on/off - more off than on填充网格与随机开/关-更多的关闭比上
+        grid = randomGrid(N)
+
+    # set up animation设置动画
+    fig,ax = plt.subplots()
+    img = ax.imshow(grid,interpolation='nearest')
+    ani = animation.FuncAnimation(fig,update,fargs=(img,grid,N,),
+                                  frames=10,
+                                  interval=updateInterval,
+                                  save_count=50)
+    # # of frames?
+    # set output file 设置输出文件
+    if args.movfile:
+        ani.save(args.movfile,fps=30,extra_args=['-vcodec','libx264'])
+
+    plt.show()
+
+if __name__=='__main__':
+    main()
