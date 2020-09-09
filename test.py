@@ -1,13 +1,12 @@
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-def addGlider(i,j, grid):
-    glider = np.array([[0,0,255],[255,0,255],[0,255,255]])
-    grid[i:i+3,j:j+3] = glider
 
-grid = np.zeros(1*1).reshape(1,1)
-
-addGlider(1,1,grid)
-
-
-print(addGlider(1,1,grid))
+a = np.array([0, 30, 45, 60, 90])
+print('不同角度的正弦值：')
+# 通过乘 pi/180 转化为弧度
+print(np.sin(a * np.pi / 180))
+print('\n')
+print('数组中角度的余弦值：')
+print(np.cos(a * np.pi / 180))
+print('\n')
+print('数组中角度的正切值：')
+print(np.tan(a * np.pi / 180))
