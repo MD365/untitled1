@@ -1,57 +1,56 @@
-from collections import deque
-import random
+from PIL import Image
 import numpy as np
-import wave
-import pygame
-def generateNote(freq):
-    nSamples = 44100
-    sampleRate = 44100
-    N =  int(sampleRate/freq)
+import math
+import sys,random,argparse
+#定义两种灰度等级
+#70个等级的灰度字符
+gscale1 = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1{}[]?_+~<>i!lI;:,\"^`"
 
-    #initialize ring buffer
-    buf = deque([random.random()-0.5 for i in range(N)])  #【-0.5，0.5】随机数生产deque
+gscale2 = "@%#*+=-:. "
+cols = 100.0 #自定义列数
+scale = 0.43
+#打开图像分割成网格
 
-    samples = np.array([0]*nSamples,'float32')  #建立浮点数组来报错声音采样
-    for i in range(nSamples):
-        samples[i] = buf[0] #第一个随机数呗复制到采样缓冲区
-        #低通滤波器
-        avg = 0.996*0.5*(buf[0] + buf[1])
-        buf.append(avg)
-        buf.popleft()
-        samples = np.array(samples*32767,'init16')  #转换为16位带符号的整数
-        return samples.tostring() #转换为字符串写入wave
+image = Image.open(fileName).convert('L')#打开图像并转换为灰度图像l
 
+W, H = image.sige[0] , image.sige[1]#分别保存了图像的宽度和高度
+
+w = W/cols #根据用户自定的列数cols计算宽度
+
+h = w/scale #计算小块的高度
 
 
-def writeWAVE(fname,data):
-    '''写入wav文件'''
-    file = wave.open(fname,'wb') #创建一个wav文件
+rows = int(H/h) #计算行数
 
-    nChannels = 1
-    sampleWidth = 2
-    frameRate = 44100
-    nFrames = 44100
+#计算平均亮度
+def getAveragel(image):
+    im = np.array(image)#灰度图像生成了一个二维数组
+    w,h = im.shape #获取二维数组的行和列
+    return np.average(im.reshape(w*h))#先将二维数组变为一维然后取平均值
 
-    file.setparams((nChannels,sampleWidth, frameRate, nFrames,'NONE','noncompressed'))#单声道、16位，无压缩、
-    file.writeframes(data)#将数据写入
-    file.close()
+#从图像生成ASCII
+aimg=[]
+for j in range(rows):
+    y1 = int(j*h)
+    y2 = int((j+1)*h)
+    if j == rows-1:
+        y2 = H
+    aimg.append("") #添加空字符
+    for i in range(cols):
+        x1 = int(i*w)
+        x2 = int((i+1)*w)
+        if i ==cols -1:
+            x2 = w
+        img = image.crop((x1,y1,x2,y2))#提取小块根据坐标点
+        avg = int(getAveragel(img)) #获取小块的平均亮度
+        if moreLevels:
+            gsval = gscale1[int((avg*69)/255)]
+        else:
+            gsval = gscale2[int((avg*9)/255)]
+        aimg[j] += gsval
 
-class NotePlayer:
-    '''播放wav文件'''
-    def __init__(self):
-        pygame.mixer.pre_init(44100,-16,1,2048)#初始化mixer类采样率、16位、单声道、缓冲区
-        pygame.init()
-        self.notes = {}  #创建一个音符字典
-
-    def add(self,fileName):
-        self.notes[fileName] = pygame.mixer.Sound(fileName)
-
-    def play(self,fileName):
-        try:
-            self.notes[fileName].play()
-        except:
-            print(fileName+'not found!')
-    def playRandom(self):
-        index = random.randint(0,len(self.notes)-1)
-        note = list(self.notes.values())[index]
-        note.play()
+#将字符串写入文件
+f = open(outFile,'w')
+for row in aimg:
+    f.write(row+'\n')
+    
